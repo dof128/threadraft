@@ -16,7 +16,7 @@ Bootstrap reports completed steps, conflicts and the next action. Exit 0 means t
 
 ## Use the project
 
-Open the target in Codex. Prepare a Git baseline commit before the first Task worktree. Write your project's scope, paths, verification commands and integration policy in its own `AGENTS.md`. See the [OpenAI guide and minimal example](https://developers.openai.com/codex/guides/agents-md). Bootstrap preserves the file's existing content or absence.
+Open the target as a trusted project in Codex so Codex can load its project-local configuration. Prepare a Git baseline commit before the first Task worktree. Write your project's scope, paths, verification commands and integration policy in its own `AGENTS.md`. See the [OpenAI guide and minimal example](https://developers.openai.com/codex/guides/agents-md). Bootstrap preserves the file's existing content or absence.
 
 1. Create a feature specification with the installed Spec Kit integration.
 2. Use `task-open` to link the full Beads ID and feature path to a worktree.
@@ -24,5 +24,7 @@ Open the target in Codex. Prepare a Git baseline commit before the first Task wo
 4. Use `task-close` when the Task's acceptance criteria and project closure conditions are met.
 
 The project-local TOML files in `.codex/agents/` define researcher, scout, implementer, reviewer and verifier roles. Set `model` and `model_reasoning_effort` per role when needed. Codex resolves the defaults when these keys are omitted. Re-running Bootstrap preserves those settings. For other local edits or name collisions, review the conflict and choose the desired file before retrying. [OpenAI custom agents](https://developers.openai.com/codex/subagents)
+
+Codex must expose the project roles in the active session before you delegate to them. If the client reports an unknown role, check project trust and client support. The roles were installed and parsed during release QA. Automatic role selection was not verified on Codex CLI `0.167.0-alpha.3.2` for Windows. [Codex role discovery issue](https://github.com/openai/codex/issues/15250)
 
 The package prepares new embedded Beads data in isolation. Keep the target's Beads database with that project and follow Beads' backup process for durable copies.

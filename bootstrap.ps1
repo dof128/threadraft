@@ -62,11 +62,16 @@ function Add-Candidate([string]$Source, [string]$RelativePath, [string]$Stage) {
     if (Test-Path -LiteralPath $destination) {
         if (Test-Path -LiteralPath $destination -PathType Leaf) {
             if ((Get-FileHash -LiteralPath $Source).Hash -eq (Get-FileHash -LiteralPath $destination).Hash) { return }
-            if ($Stage -eq 'agents') {
-                $modelLines = '(?m)^[ \t]*(?:model|model_reasoning_effort)[ \t]*=.*(?:\n|$)'
-                $sourceText = [IO.File]::ReadAllText($Source).Replace("\r\n", "\n")
-                $targetText = [IO.File]::ReadAllText($destination).Replace("\r\n", "\n")
-                if ($sourceText -ceq [regex]::Replace($targetText, $modelLines, '')) { return }
+            if ($Stage -in @('skills','agents')) {
+                $lf = [string][char]10
+                $crlf = [string][char]13 + $lf
+                $sourceText = [IO.File]::ReadAllText($Source).Replace($crlf,$lf)
+                $targetText = [IO.File]::ReadAllText($destination).Replace($crlf,$lf)
+                if ($Stage -eq 'agents') {
+                    $modelLines = '(?m)^[ \t]*(?:model|model_reasoning_effort)[ \t]*=.*(?:\n|$)'
+                    $targetText = [regex]::Replace($targetText, $modelLines, '')
+                }
+                if ($sourceText -ceq $targetText) { return }
             }
         }
         $result.conflicts += $RelativePath
@@ -104,10 +109,13 @@ function Get-IgnoreAppend([string]$Path) {
         }
     }
     $content = $encoding.GetString($bytes,$offset,$bytes.Length-$offset)
-    $rules = @('/.worktrees/','/.env') | Where-Object { $_ -cnotin ($content -split '\r\n|\n|\r') }
+    $rules = @('/.worktrees/','/.beads.gate.lock','/.beads-bootstrap-*/','/.env') | Where-Object { $_ -cnotin ($content -split '\r\n|\n|\r') }
     if (-not $rules) { return }
-    $nl = if ($content.Contains("\r\n")) { "\r\n" } elseif ($content.Contains("\n")) { "\n" }
-        elseif ($content.Contains("\r")) { "\r" } else { [Environment]::NewLine }
+    $cr = [string][char]13
+    $lf = [string][char]10
+    $crlf = $cr + $lf
+    $nl = if ($content.Contains($crlf)) { $crlf } elseif ($content.Contains($lf)) { $lf }
+        elseif ($content.Contains($cr)) { $cr } else { [Environment]::NewLine }
     $prefix = if ($content -and $content -notmatch '[\r\n]$') { $nl } else { '' }
     return $encoding.GetBytes($prefix + ($rules -join $nl) + $nl)
 }
