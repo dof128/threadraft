@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "platform": {
+    "os": "Windows",
+    "shell": "PowerShell",
+    "shellMajorVersion": 7
+  },
+  "requiredTools": [
+    {
+      "id": "git",
+      "command": "git",
+      "versionArgs": ["--version"],
+      "purpose": "저장소와 Task worktree 관리"
+    },
+    {
+      "id": "specify",
+      "command": "specify",
+      "versionArgs": ["version"],
+      "purpose": "Spec Kit 프로젝트 설정과 명세 흐름 준비"
+    },
+    {
+      "id": "beads",
+      "command": "bd",
+      "versionArgs": ["--version"],
+      "purpose": "Task 상태와 의존성 관리"
+    }
+  ],
+  "optionalTools": [
+    { "id": "rg", "command": "rg", "purpose": "텍스트와 파일 검색" },
+    { "id": "python", "command": "python", "purpose": "Python 스크립트 실행" },
+    { "id": "uv", "command": "uv", "purpose": "Python 도구와 환경 관리" },
+    { "id": "node", "command": "node", "purpose": "Node.js 스크립트 실행" },
+    { "id": "npm", "command": "npm", "purpose": "Node.js 패키지와 스크립트 관리" },
+    { "id": "robocopy", "command": "robocopy", "purpose": "Windows 파일 복사" }
+  ],
+  "optionalMcpServers": [
+    { "id": "node_repl", "purpose": "대화형 JavaScript 실행" },
+    { "id": "serena", "purpose": "코드 심볼 탐색" },
+    { "id": "ast-grep", "purpose": "코드 구조 검색" },
+    { "id": "vsdbg", "purpose": "Visual Studio 디버거 제어" },
+    { "id": "debugmcp", "purpose": "디버그 세션 조회와 제어" }
+  ]
+}
