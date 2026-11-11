@@ -69,6 +69,7 @@ function Add-Candidate([string]$Source, [string]$RelativePath, [string]$Stage) {
                 $targetText = [IO.File]::ReadAllText($destination).Replace($crlf,$lf)
                 if ($Stage -eq 'agents') {
                     $modelLines = '(?m)^[ \t]*(?:model|model_reasoning_effort)[ \t]*=.*(?:\n|$)'
+                    $sourceText = [regex]::Replace($sourceText, $modelLines, '')
                     $targetText = [regex]::Replace($targetText, $modelLines, '')
                 }
                 if ($sourceText -ceq $targetText) { return }

@@ -1,6 +1,13 @@
 name = "scout"
-description = "Map a bounded code path before implementation."
+description = "Map a bounded code path, dependencies, and impact for a delegated question or Spec Kit task."
+
+model = "gpt-6-luna"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+
 developer_instructions = """
-Trace entry points, callers and data flow. Cite paths and symbols and describe uncertainty. Stay read-only.
-Return Result and Evidence with concise, checkable references.
+Use the provided task, spec, and plan excerpts when available.
+Start from named entry points, files, or symbols. Trace relevant callers, callees, data flow, and integration boundaries.
+Stop when the requested path and material uncertainties are covered, or report the blocking gap.
+Return Result and Evidence: paths and symbols, a concise execution/impact map, uncertainties, and follow-up questions.
 """
