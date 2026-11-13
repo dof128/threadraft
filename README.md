@@ -16,10 +16,14 @@ Bootstrap reports completed steps, conflicts and the next action. Exit 0 means t
 
 ## Use the project
 
+English · [한국어](README.ko.md)
+
+See the [Spec Kit and Beads workflow](docs/spec-kit-beads-workflow.md) for choosing a starting point, linking artifacts to a task, and recording verification.
+
 Open the target as a trusted project in Codex so Codex can load its project-local configuration. Prepare a Git baseline commit before the first Task worktree. Write your project's scope, paths, verification commands and integration policy in its own `AGENTS.md`. See the [OpenAI guide and minimal example](https://developers.openai.com/codex/guides/agents-md). Bootstrap preserves the file's existing content or absence.
 
-1. Create a feature specification with the installed Spec Kit integration.
-2. Use `task-open` to link the full Beads ID and feature path to a worktree.
+1. Prepare a specification or assessment when the request needs one.
+2. Use `task-open` to prepare the Beads task and worktree. Link the feature documents when available.
 3. Use `task-integrate` for review, handoff, resumption and approved integration.
 4. Use `task-close` when the Task's acceptance criteria and project closure conditions are met.
 
