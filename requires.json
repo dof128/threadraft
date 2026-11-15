@@ -10,7 +10,7 @@
       "id": "git",
       "command": "git",
       "versionArgs": ["--version"],
-      "purpose": "저장소와 Task worktree 관리"
+      "purpose": "프로젝트 Git 저장소 초기화 및 확인"
     },
     {
       "id": "specify",

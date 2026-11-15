@@ -1,6 +1,6 @@
 # Agent Bootstrap
 
-Prepare a Windows project for Spec Kit, Beads and Codex with PowerShell 7. The package provides three Task skills and five project-scoped Codex agents.
+Prepare a Windows project for Spec Kit, Beads and Codex with PowerShell 7. The package provides two workflow skills and five project-scoped Codex agents.
 
 ## Run
 
@@ -18,17 +18,21 @@ Bootstrap reports completed steps, conflicts and the next action. Exit 0 means t
 
 English · [한국어](README.ko.md)
 
-See the [Spec Kit and Beads workflow](docs/spec-kit-beads-workflow.md) for choosing a starting point, linking artifacts to a task, and recording verification.
+See the [Spec Kit and Beads workflow](docs/spec-kit-beads-workflow.md) for choosing a starting point, linking artifacts to an issue, and recording verification.
 
-Open the target as a trusted project in Codex so Codex can load its project-local configuration. Prepare a Git baseline commit before the first Task worktree. Write your project's scope, paths, verification commands and integration policy in its own `AGENTS.md`. See the [OpenAI guide and minimal example](https://developers.openai.com/codex/guides/agents-md). Bootstrap preserves the file's existing content or absence.
+Open the target as a trusted project in Codex so Codex can load its project-local configuration. Write your project's scope, paths, verification commands and integration policy in its own `AGENTS.md`. See the [OpenAI guide and minimal example](https://developers.openai.com/codex/guides/agents-md). Bootstrap preserves the file's existing content or absence.
 
 1. Prepare a specification or assessment when the request needs one.
-2. Use `task-open` to prepare the Beads task and worktree. Link the feature documents when available.
-3. Use `task-integrate` for review, handoff, resumption and approved integration.
-4. Use `task-close` when the Task's acceptance criteria and project closure conditions are met.
+2. Use `issue-create` to register or reuse a Beads issue, prepare its Git worktree, and link reviewed artifacts.
+3. Use `issue-create` to resume work, record verification, and prepare handoff.
+4. Use `issue-close` to close the issue once its acceptance and closure criteria are met, then clean up its linked worktree and branch when safe.
 
 The project-local TOML files in `.codex/agents/` define researcher, scout, implementer, reviewer and verifier roles. Set `model` and `model_reasoning_effort` per role when needed. Codex resolves the defaults when these keys are omitted. Re-running Bootstrap preserves those settings. For other local edits or name collisions, review the conflict and choose the desired file before retrying. [OpenAI custom agents](https://developers.openai.com/codex/subagents)
 
 Windows Codex CLI 0.167.0-alpha.3.2 reproduced a role discovery bug. In a fresh session, automatic registration returned an unknown agent type for a valid project role. A control run registered the same reviewer TOML through the CLI description and config_file overrides and confirmed the child role, model and reasoning effort in the session record. Automatic discovery remains a release limitation. [Related Codex issue](https://github.com/openai/codex/issues/14579)
 
 The package prepares new embedded Beads data in isolation. Keep the target's Beads database with that project and follow Beads' backup process for durable copies.
+
+## License
+
+Threadraft is distributed under the [MIT License](LICENSE).

@@ -175,7 +175,7 @@ try {
     }
 
     $pending = [Collections.Generic.List[hashtable]]::new()
-    foreach ($skill in @('task-open','task-integrate','task-close')) {
+    foreach ($skill in @('issue-create','issue-close')) {
         $relative = ".agents/skills/$skill/SKILL.md"
         Add-Candidate (Join-Path $package $relative) $relative 'skills'
     }
@@ -296,7 +296,7 @@ try {
     }
     $result.stages.gitignore = if ($ignoreAppend.Count) { 'created' } else { 'preserved' }
     $result.status = 'ready'
-    $result.nextAction = 'Open the target in Codex. Review project policy and prepare a Git baseline before opening a Task worktree.'
+    $result.nextAction = 'Open the target in Codex. Review project policy, then use Spec Kit and Beads for the requested work.'
     $exitCode = 0
 } catch {
     if ($exitCode -eq 1) { $result.stages[$active] = 'failed' }
