@@ -1,29 +1,29 @@
 # Agent Bootstrap
 
-Prepare a Windows project for Spec Kit, Beads and Codex with PowerShell 7. The package provides two workflow skills and five project-scoped Codex agents.
+Prepare a Windows project for Spec Kit and Codex with PowerShell 7. The package provides two workflow skills and five project-scoped Codex agents.
 
 ## Run
 
-Install Git, [Specify CLI](https://github.github.io/spec-kit/installation.html) and [Beads](https://github.com/gastownhall/beads), and open PowerShell 7. Clone the package repository or extract its ZIP. Run the same command from either copy with a separate target directory.
+Install Git and [Specify CLI](https://github.github.io/spec-kit/installation.html), then open PowerShell 7. Clone the package repository or extract its ZIP. Run the same command from either copy with a separate target directory.
 
 ```powershell
 pwsh -NoProfile -File .\bootstrap.ps1 -ProjectPath 'C:\Projects\my-project' -Json
 ```
 
-The target may be absent or may already contain project files. Use `-GitPath`, `-SpecifyPath` or `-BeadsPath` for executables outside PATH. [requires.json](requires.json) lists required CLI and optional CLI and MCP tools.
+The target may be absent or may already contain project files. Use `-GitPath` or `-SpecifyPath` for executables outside PATH. [requires.json](requires.json) lists required CLI and optional CLI and MCP tools.
 
-Bootstrap reports completed steps, conflicts and the next action. Exit 0 means the target is ready. Exit 2 means preflight blocked the run. Exit 1 means a preparation or apply step failed. Fix the reported cause and rerun the same command. A conflicting file is preserved. A failed Beads transfer reports the path of any incoming copy for inspection.
+Bootstrap reports completed steps, conflicts and the next action. Exit 0 means the target is ready. Exit 2 means preflight blocked the run. Exit 1 means a preparation or apply step failed. Fix the reported cause and rerun the same command. A conflicting file is preserved.
 
 ## Use the project
 
 English · [한국어](README.ko.md)
 
-See the [Spec Kit and Beads workflow](docs/spec-kit-beads-workflow.md) for choosing a starting point, linking artifacts to an issue, and recording verification.
+See the [Spec Kit workflow](docs/spec-kit-workflow.md) for choosing a starting point, linking artifacts to an issue, and recording verification.
 
 Open the target as a trusted project in Codex so Codex can load its project-local configuration. Write your project's scope, paths, verification commands and integration policy in its own `AGENTS.md`. See the [OpenAI guide and minimal example](https://developers.openai.com/codex/guides/agents-md). Bootstrap preserves the file's existing content or absence.
 
 1. Prepare a specification or assessment when the request needs one.
-2. Use `issue-create` to register or reuse a Beads issue, prepare its Git worktree, and link reviewed artifacts.
+2. Use `issue-create` to create or resume a document-backed issue, prepare its Git worktree, and link reviewed artifacts.
 3. Use `issue-create` to resume work, record verification, and prepare handoff.
 4. Use `issue-close` to close the issue once its acceptance and closure criteria are met, then clean up its linked worktree and branch when safe.
 
@@ -31,7 +31,6 @@ The project-local TOML files in `.codex/agents/` define researcher, scout, imple
 
 Windows Codex CLI 0.167.0-alpha.3.2 reproduced a role discovery bug. In a fresh session, automatic registration returned an unknown agent type for a valid project role. A control run registered the same reviewer TOML through the CLI description and config_file overrides and confirmed the child role, model and reasoning effort in the session record. Automatic discovery remains a release limitation. [Related Codex issue](https://github.com/openai/codex/issues/14579)
 
-The package prepares new embedded Beads data in isolation. Keep the target's Beads database with that project and follow Beads' backup process for durable copies.
 
 ## License
 

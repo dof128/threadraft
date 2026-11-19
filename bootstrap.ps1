@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$ProjectPath,
-    [string]$GitPath, [string]$SpecifyPath, [string]$BeadsPath,
+    [string]$GitPath, [string]$SpecifyPath,
     [switch]$Json
 )
 
@@ -9,7 +9,7 @@ $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
 $result = [ordered]@{
     projectPath = $ProjectPath; status = 'blocked'; tools = @()
-    stages = [ordered]@{ preflight = 'blocked'; git = 'blocked'; beads = 'blocked'; specify = 'blocked'; skills = 'blocked'; agents = 'blocked'; gitignore = 'blocked' }
+    stages = [ordered]@{ preflight = 'blocked'; git = 'blocked'; specify = 'blocked'; skills = 'blocked'; agents = 'blocked'; gitignore = 'blocked' }
     conflicts = @(); nextAction = ''
 }
 $exitCode = 2
@@ -110,7 +110,7 @@ function Get-IgnoreAppend([string]$Path) {
         }
     }
     $content = $encoding.GetString($bytes,$offset,$bytes.Length-$offset)
-    $rules = @('/.worktrees/','/.beads.gate.lock','/.beads-bootstrap-*/','/.env') | Where-Object { $_ -cnotin ($content -split '\r\n|\n|\r') }
+    $rules = @('/.worktrees/','/.env') | Where-Object { $_ -cnotin ($content -split '\r\n|\n|\r') }
     if (-not $rules) { return }
     $cr = [string][char]13
     $lf = [string][char]10
@@ -127,15 +127,15 @@ try {
     $target = [IO.Path]::TrimEndingDirectorySeparator($ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($ProjectPath))
     $result.projectPath = $target
     $manifest = Get-Content -Raw -LiteralPath (Join-Path $package 'requires.json') | ConvertFrom-Json
-    if (($manifest.requiredTools.id -join ',') -ne 'git,specify,beads') { throw 'Unexpected required-tool manifest.' }
+    if (($manifest.requiredTools.id -join ',') -ne 'git,specify') { throw 'Unexpected required-tool manifest.' }
     if ($manifest.schemaVersion -ne 1 -or -not $IsWindows -or $manifest.platform.os -ne 'Windows' -or
         $manifest.platform.shellMajorVersion -ne $PSVersionTable.PSVersion.Major) { throw 'Use Windows and PowerShell 7.' }
     if ($target -eq [IO.Path]::GetPathRoot($target) -or (Test-Inside $target $package) -or (Test-Inside $package $target)) {
         throw 'Choose a project directory separate from the package and its ancestors.'
     }
     Assert-Directory $target
-    $routing = @('GIT_DIR','GIT_WORK_TREE','GIT_COMMON_DIR','GIT_INDEX_FILE','BEADS_DIR','SPECIFY_INIT_DIR')
-    if (Get-ChildItem Env: | Where-Object { $_.Name -in $routing -or $_.Name -like 'BEADS_DOLT_*' }) {
+    $routing = @('GIT_DIR','GIT_WORK_TREE','GIT_COMMON_DIR','GIT_INDEX_FILE','SPECIFY_INIT_DIR')
+    if (Get-ChildItem Env: | Where-Object { $_.Name -in $routing }) {
         throw 'Clear workspace routing environment overrides and retry.'
     }
 
@@ -144,7 +144,7 @@ try {
     try { $held = $mutex.WaitOne(0) } catch [Threading.AbandonedMutexException] { $held = $true }
     if (-not $held) { throw 'Bootstrap is already running for this target.' }
 
-    $overrides = @{ git = $GitPath; specify = $SpecifyPath; beads = $BeadsPath }
+    $overrides = @{ git = $GitPath; specify = $SpecifyPath }
     $exe = @{}
     foreach ($tool in $manifest.requiredTools) {
         $lookup = $overrides[$tool.id]
@@ -164,7 +164,7 @@ try {
     if ($exe.Count -ne $manifest.requiredTools.Count) { throw 'Install the reported required tools or supply their executable paths.' }
 
     foreach ($name in @('.git','.gitignore','AGENTS.md')) { Assert-LocalPath (Join-Path $target $name) }
-    foreach ($name in @('.beads','.specify','.agents/skills','.codex/agents')) { Assert-Directory (Join-Path $target $name) }
+    foreach ($name in @('.specify','.agents/skills','.codex/agents')) { Assert-Directory (Join-Path $target $name) }
     $probe = $target
     while (-not (Test-Path -LiteralPath $probe -PathType Container)) { $probe = [IO.Path]::GetDirectoryName($probe) }
     $run = Invoke-Tool $exe.git @('rev-parse','--show-toplevel') $probe
@@ -198,19 +198,6 @@ try {
     if (Test-Path -LiteralPath $ignore -PathType Container) { $result.conflicts += '.gitignore' }
     if ($result.conflicts.Count) { throw 'Resolve the listed conflicts and retry.' }
     $ignoreAppend = @(Get-IgnoreAppend $ignore)
-
-    $beads = Join-Path $target '.beads'
-    $hasBeads = Test-Path -LiteralPath $beads
-    if ($hasBeads) {
-        $run = Invoke-Tool $exe.beads @('--sandbox','where','--json') $target
-        Assert-Success $run 'Existing Beads lookup failed'
-        $location = $run.output | ConvertFrom-Json
-        $database = [IO.Path]::GetFullPath($location.database_path)
-        if ([IO.Path]::GetFullPath($location.path) -ne $beads -or -not (Test-Inside $database $beads)) {
-            throw 'Existing Beads workspace or database is outside the target.'
-        }
-        Assert-LocalPath $database
-    }
 
     $integration = Join-Path $target '.specify/integration.json'
     Assert-LocalPath $integration
@@ -255,36 +242,10 @@ try {
     $result.stages.preflight = 'ready'
     $exitCode = 1
     $result.status = 'failed'
-    $active = 'beads'
-    if (-not $hasBeads) {
-        $stage = Join-Path $scratch 'beads'
-        [IO.Directory]::CreateDirectory($stage) | Out-Null
-        $prefix = [regex]::Replace([IO.Path]::GetFileName($target).ToLowerInvariant(),'[^a-z0-9]+','-').Trim('-')
-        if (-not $prefix) { $prefix = 'task' }
-        $prefix = $prefix.Substring(0,[Math]::Min(20,$prefix.Length)).TrimEnd('-')
-        Assert-Success (Invoke-Tool $exe.beads @('--sandbox','init','--non-interactive','--prefix',$prefix,'--skip-agents','--skip-hooks') $stage) 'Beads preparation failed'
-        $stagedBeads = Join-Path $stage '.beads'
-        Assert-Directory $stagedBeads
-        if (-not (Test-Path -LiteralPath (Join-Path $stagedBeads 'metadata.json') -PathType Leaf) -or
-            (Get-ChildItem -LiteralPath $stagedBeads -Recurse -Force -Attributes ReparsePoint)) { throw 'Unexpected staged Beads layout.' }
-    } else {
-        Assert-Success (Invoke-Tool $exe.beads @('--sandbox','ready','--json') $target) 'Existing Beads readiness check failed'
-    }
-
     $active = 'git'
     [IO.Directory]::CreateDirectory($target) | Out-Null
     if (-not $hasGit) { Assert-Success (Invoke-Tool $exe.git @('init','-b','main') $target) 'Git initialization failed' }
     $result.stages.git = if ($hasGit) { 'preserved' } else { 'created' }
-    $active = 'beads'
-    if (-not $hasBeads) {
-        $incoming = Join-Path $target ('.beads-bootstrap-' + [guid]::NewGuid().ToString('N'))
-        try {
-            Copy-Item -LiteralPath $stagedBeads -Destination $incoming -Recurse
-            [IO.Directory]::Move($incoming,$beads)
-        } catch { throw "Beads transfer failed. Inspect $incoming before retrying. $_" }
-        Assert-Success (Invoke-Tool $exe.beads @('--sandbox','ready','--json') $target) 'New Beads readiness check failed'
-    }
-    $result.stages.beads = if ($hasBeads) { 'preserved' } else { 'created' }
     foreach ($stage in @('specify','skills','agents')) {
         $active = $stage
         $result.stages[$stage] = Install-Files $stage
@@ -296,7 +257,7 @@ try {
     }
     $result.stages.gitignore = if ($ignoreAppend.Count) { 'created' } else { 'preserved' }
     $result.status = 'ready'
-    $result.nextAction = 'Open the target in Codex. Review project policy, then use Spec Kit and Beads for the requested work.'
+    $result.nextAction = 'Open the target in Codex. Review project policy, then use Spec Kit and the workflow skills for the requested work.'
     $exitCode = 0
 } catch {
     if ($exitCode -eq 1) { $result.stages[$active] = 'failed' }

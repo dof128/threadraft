@@ -17,12 +17,6 @@
       "command": "specify",
       "versionArgs": ["version"],
       "purpose": "Spec Kit 프로젝트 설정과 명세 흐름 준비"
-    },
-    {
-      "id": "beads",
-      "command": "bd",
-      "versionArgs": ["--version"],
-      "purpose": "Task 상태와 의존성 관리"
     }
   ],
   "optionalTools": [

@@ -2,28 +2,28 @@
 
 [English](README.md) · 한국어
 
-PowerShell 7을 사용해 Windows 프로젝트에서 Spec Kit, Beads, Codex를 사용할 수 있도록 준비합니다. 이 패키지는 작업 절차 스킬 2개와 프로젝트 범위의 Codex 에이전트 5개를 제공합니다.
+PowerShell 7을 사용해 Windows 프로젝트에서 Spec Kit과 Codex를 사용할 수 있도록 준비합니다. 이 패키지는 작업 절차 스킬 2개와 프로젝트 범위의 Codex 에이전트 5개를 제공합니다.
 
 ## 실행
 
-Git, [Specify CLI](https://github.github.io/spec-kit/installation.html), [Beads](https://github.com/gastownhall/beads)를 설치하고 PowerShell 7을 엽니다. 패키지 저장소를 복제하거나 ZIP을 풉니다. 어느 방식이든 패키지 디렉터리에서 별도의 대상 디렉터리를 지정해 같은 명령을 실행합니다.
+Git과 [Specify CLI](https://github.github.io/spec-kit/installation.html)를 설치하고 PowerShell 7을 엽니다. 패키지 저장소를 복제하거나 ZIP을 풉니다. 어느 방식이든 패키지 디렉터리에서 별도의 대상 디렉터리를 지정해 같은 명령을 실행합니다.
 
 ```powershell
 pwsh -NoProfile -File .\bootstrap.ps1 -ProjectPath 'C:\Projects\my-project' -Json
 ```
 
-대상 디렉터리는 아직 없거나 기존 프로젝트 파일을 포함할 수 있습니다. 실행 파일이 PATH에 없으면 `-GitPath`, `-SpecifyPath`, `-BeadsPath`로 경로를 지정합니다. 필수 CLI와 선택 CLI·MCP 도구 목록은 [requires.json](requires.json)에서 확인할 수 있습니다.
+대상 디렉터리는 아직 없거나 기존 프로젝트 파일을 포함할 수 있습니다. 실행 파일이 PATH에 없으면 `-GitPath` 또는 `-SpecifyPath`로 경로를 지정합니다. 필수 CLI와 선택 CLI·MCP 도구 목록은 [requires.json](requires.json)에서 확인할 수 있습니다.
 
-Bootstrap은 완료한 단계, 충돌, 다음 조치를 보고합니다. 종료 코드 0은 대상 준비 완료, 2는 사전 검사에서 실행이 차단된 상태, 1은 준비 또는 적용 단계의 실패를 뜻합니다. 보고된 원인을 해결한 뒤 같은 명령을 다시 실행합니다. 충돌이 발생한 기존 파일은 보존합니다. Beads 데이터 이전에 실패하면 확인할 수 있도록 옮겨 온 사본의 경로를 보고합니다.
+Bootstrap은 완료한 단계, 충돌, 다음 조치를 보고합니다. 종료 코드 0은 대상 준비 완료, 2는 사전 검사에서 실행이 차단된 상태, 1은 준비 또는 적용 단계의 실패를 뜻합니다. 보고된 원인을 해결한 뒤 같은 명령을 다시 실행합니다. 충돌이 발생한 기존 파일은 보존합니다.
 
 ## 프로젝트 사용
 
-작업 유형에 맞는 절차 선택, 산출물과 이슈 연결, 검증 결과 기록은 [Spec Kit과 Beads 사용 절차](docs/spec-kit-beads-workflow.ko.md)를 참고합니다.
+작업 유형에 맞는 절차 선택, 산출물과 이슈 연결, 검증 결과 기록은 [Spec Kit 사용 절차](docs/spec-kit-workflow.ko.md)를 참고합니다.
 
 Codex에서 대상 프로젝트를 신뢰할 수 있는 프로젝트로 열어 프로젝트별 설정을 불러옵니다. 프로젝트의 작업 범위, 경로, 검증 명령, 통합 정책을 해당 프로젝트의 `AGENTS.md`에 기록합니다. Bootstrap은 기존 파일의 내용을 보존하며, 파일이 없으면 그대로 둡니다. [OpenAI 가이드와 최소 예시](https://developers.openai.com/codex/guides/agents-md)
 
 1. 요청에 따라 명세나 평가 문서를 준비합니다.
-2. `issue-create`으로 Beads 이슈를 등록하거나 재사용하고, Git worktree와 검토한 산출물을 연결합니다.
+2. `issue-create`로 작업 문서와 Git worktree를 연결해 이슈를 시작하거나 재개합니다.
 3. `issue-create`으로 작업을 재개하고 검증과 인계 내용을 기록합니다.
 4. 인수 기준과 종료 조건을 충족하면 `issue-close`로 이슈를 종료한 뒤, 보존할 변경이 있는지 확인하고 연결된 worktree와 브랜치를 정리합니다.
 
@@ -31,7 +31,6 @@ Codex에서 대상 프로젝트를 신뢰할 수 있는 프로젝트로 열어 �
 
 Windows용 Codex CLI 0.167.0-alpha.3.2에서 역할 자동 검색 오류를 재현했습니다. 새 세션에서 유효한 프로젝트 역할이 자동 등록 과정에서 알 수 없는 에이전트 유형으로 처리됐습니다. 비교 실행에서는 CLI에서 `description`과 `config_file`을 직접 지정해 같은 리뷰어 TOML을 등록했고, 세션 기록에서 하위 에이전트의 역할, 모델, 추론 강도를 확인했습니다. 해당 버전에는 역할 자동 검색 제약이 있습니다. [관련 Codex 이슈](https://github.com/openai/codex/issues/14579)
 
-패키지는 새 임베디드 Beads 데이터를 격리된 환경에서 준비합니다. 대상의 Beads 데이터베이스는 해당 프로젝트와 함께 관리하고, 장기 보존용 사본은 Beads의 백업 절차에 따라 만듭니다.
 
 ## 라이선스
 

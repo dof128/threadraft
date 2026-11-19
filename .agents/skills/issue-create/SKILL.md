@@ -1,16 +1,10 @@
 ---
 name: issue-create
-description: Create or resume a Beads issue, link its Spec Kit artifacts and Git worktree, and record progress.
+description: Create or resume a document-backed issue and prepare its Git worktree.
 ---
 
-1. From the project root, confirm the active Git repository and Beads workspace with `git rev-parse --show-toplevel` and `bd where`. Read the reviewed Spec Kit feature documents or bug assessment when available. For a request without artifacts, use the agreed scope and acceptance criteria.
-2. Resolve the project's approved Git starting point to a commit. Confirm that any linked artifacts are available at that commit so they will be visible in the new worktree. If an initial commit or artifact publication is needed, report the gap before creating the issue. Preserve local changes.
-3. Use `bd show <id>` or `bd list` to find a matching issue. Reuse its full ID. When creation is requested and no match exists, use `bd create`. If a write has an uncertain result, query Beads before retrying.
-4. Use the project's branch and worktree naming policy, or default to `issue/<full-id>` and `.worktrees/<full-id>`. Check `git worktree list --porcelain` and local branches. Reuse a verified issue worktree. Create a new branch and worktree with `git worktree add -b <branch> <path> <base>`, or attach a verified existing issue branch with `git worktree add <path> <branch>`. Stop on a path or branch collision that cannot be attributed to the issue.
-5. Use `bd update` to record scope, acceptance criteria, outstanding checks, project-relative artifact and worktree paths, branch, and base commit. Preserve existing details. Put the full Beads ID near the top of the issue worktree's linked `tasks.md` when it exists, preserving its checklist. Resolve a conflicting ID before editing.
-6. Verify the Beads record with `bd show <id>` and compare it with `git worktree list --porcelain` and the linked artifacts. Report the full ID, worktree, branch, and remaining checks. If setup partially succeeds, keep and report the created issue or worktree so a retry can resume it.
-
-## Resume or update an issue
-
-1. Confirm the project Git repository and Beads workspace. Use `bd ready` to find eligible work or `bd show <id>` to inspect an issue. Compare its recorded branch and worktree with `git worktree list --porcelain` before operating there. Read linked Spec Kit artifacts and check scope and blockers.
-2. Use `bd update` to record authorized status changes, blockers, verification results, remaining checks, and the next action. Preserve existing issue details. Update the linked `tasks.md` checklist in the worktree as implementation steps are completed.
+1. Confirm the active repository with `git rev-parse --show-toplevel`. Read the project's issue and worktree conventions. Use the requested issue key or the linked Spec Kit feature directory name. For new work without a supplied key or feature directory, choose a short descriptive key and check it against existing issue records and branches.
+2. Use the project's existing issue document, or use `docs/issues/<key>.md` at the project root as the default record. Keep the record accessible independently of the worktree. Reuse the record for a matching issue. Create it only for requested new work. Record the key, agreed scope and acceptance criteria, linked artifact paths, and pending checks. For work without Spec Kit artifacts, record the agreed scope and criteria directly.
+3. Resolve the approved Git starting point to a commit. Check that linked artifacts needed in the worktree are available at that commit. Report missing commits or artifacts before creating the worktree. Preserve local changes.
+4. Use the project's naming policy, or default to `issue/<key>` and `.worktrees/<key>`. Compare existing records, local branches, and `git worktree list --porcelain`. Reuse a verified worktree. Use `git worktree add -b <branch> <path> <base>` for a new branch or `git worktree add <path> <branch>` to attach a verified existing branch. Resolve an unexplained collision before creating anything at that path.
+5. Record and verify the project-relative worktree path, branch, and base commit in the issue document. On resumption, compare the record with Git and update status, blockers, verification results, and the next action as work progresses. Update the linked `tasks.md` checklist when one exists. If setup is incomplete, report which steps succeeded so a retry can reuse them.
