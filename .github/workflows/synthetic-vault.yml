@@ -1,0 +1,27 @@
+name: Synthetic Vault
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install QMD
+        shell: pwsh
+        run: npm install --global @tobilu/qmd@2.9.0
+      - name: Exercise a synthetic Vault
+        shell: pwsh
+        run: ./tests/Test-SyntheticVault.ps1 -WithQmd

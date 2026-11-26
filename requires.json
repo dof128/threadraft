@@ -6,32 +6,12 @@
     "shellMajorVersion": 7
   },
   "requiredTools": [
-    {
-      "id": "git",
-      "command": "git",
-      "versionArgs": ["--version"],
-      "purpose": "프로젝트 Git 저장소 초기화 및 확인"
-    },
-    {
-      "id": "specify",
-      "command": "specify",
-      "versionArgs": ["version"],
-      "purpose": "Spec Kit 프로젝트 설정과 명세 흐름 준비"
-    }
+    { "id": "git", "command": "git", "versionArgs": ["--version"], "purpose": "운영 계층 버전 관리" },
+    { "id": "pwsh", "command": "pwsh", "versionArgs": ["--version"], "purpose": "Vault 초기화 및 연동 실행" }
   ],
   "optionalTools": [
-    { "id": "rg", "command": "rg", "purpose": "텍스트와 파일 검색" },
-    { "id": "python", "command": "python", "purpose": "Python 스크립트 실행" },
-    { "id": "uv", "command": "uv", "purpose": "Python 도구와 환경 관리" },
-    { "id": "node", "command": "node", "purpose": "Node.js 스크립트 실행" },
-    { "id": "npm", "command": "npm", "purpose": "Node.js 패키지와 스크립트 관리" },
-    { "id": "robocopy", "command": "robocopy", "purpose": "Windows 파일 복사" }
-  ],
-  "optionalMcpServers": [
-    { "id": "node_repl", "purpose": "대화형 JavaScript 실행" },
-    { "id": "serena", "purpose": "코드 심볼 탐색" },
-    { "id": "ast-grep", "purpose": "코드 구조 검색" },
-    { "id": "vsdbg", "purpose": "Visual Studio 디버거 제어" },
-    { "id": "debugmcp", "purpose": "디버그 세션 조회와 제어" }
+    { "id": "python", "command": "python", "purpose": "Python 3.10 이상, Health와 Graph 실행" },
+    { "id": "qmd", "command": "qmd", "purpose": "로컬 Markdown 검색" },
+    { "id": "obsidian", "command": "obsidian", "purpose": "Vault 열람 및 편집" }
   ]
 }

@@ -2,3 +2,7 @@
 /.worktrees/
 /dist/
 /.env
+
+/vault/
+/.cache/
+__pycache__/
